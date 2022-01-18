@@ -1,9 +1,8 @@
-import {Alert, Button, Card, Checkbox, Form, Input, Typography} from "antd";
-import React, {useRef, useState} from "react";
+import {Alert, Button, Card, Checkbox, Form, Input} from "antd";
+import React, {useCallback, useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
-import {useHistory} from "react-router";
-
-const {Text} = Typography;
+import {useHistory, useLocation} from "react-router";
+import Moralis from "moralis";
 
 const styles = {
     title: {
@@ -28,7 +27,7 @@ const styles = {
 };
 
 export default function NewProject() {
-    const {user, Moralis} = useMoralis();
+    const {user} = useMoralis();
     const [alertInfo, setAlertInfo] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const projectNameRef = useRef();
@@ -36,6 +35,8 @@ export default function NewProject() {
     const deactivationUrlRef = useRef();
     const isPublicRef = useRef();
     const history = useHistory();
+    const location = useLocation();
+    const existingProject = location.state?.project;
 
 
     async function onCreateClick(e) {
@@ -46,7 +47,15 @@ export default function NewProject() {
         try {
             // const result = await Moralis.Cloud.run("HelloWorld")
             const Project = new Moralis.Object.extend("Project");
-            const project = new Project();
+            let project = new Project();
+
+            if (existingProject) {
+                project.set("id", location.state.id)
+            }
+
+            if (!project.isDataAvailable()) {
+                project = await project.fetch();
+            }
 
             project.set("owner", user)
             project.set("name", projectNameRef.current.input.value)
@@ -55,20 +64,25 @@ export default function NewProject() {
             project.set("isPublic", isPublicRef.current.input.checked || false)
 
             await project.save()
-            history.push("/projects")
 
-        } catch(e) {
+            if (existingProject) {
+                setAlertInfo("Updated successfuly")
+            } else {
+                history.push("/projects")
+            }
+
+        } catch (e) {
             setAlertInfo("Sth went wrong :(")
             console.error("Sth went wrong :( " + e)
         } finally {
             setIsLoading(false)
         }
-    }
+    };
 
     return (
         <div style={{display: "flex"}}>
             <Card title={"New Project"} style={styles.card}>
-                {alertInfo && <Alert message={JSON.stringify(alertInfo)}/>}
+                {alertInfo && <Alert message={alertInfo}/>}
                 <Form
                     labelCol={{
                         span: 28,
@@ -77,6 +91,12 @@ export default function NewProject() {
                         span: 28,
                     }}
                     layout="vertical"
+                    initialValues={{
+                        projectName: existingProject?.name || "",
+                        activationUrl: existingProject?.kajabiActivationUrl || "",
+                        deactivationUrl: existingProject?.kajabiDeactivationUrl || "",
+                        isPublic: existingProject?.isPublic || false,
+                    }}
                 >
 
                     <Form.Item
@@ -104,7 +124,7 @@ export default function NewProject() {
                         ]}
                     >
                         <Input ref={activationUrlRef}
-                            placeholder={"https://checkout.kajabi.com/webhooks/offers/Z6agK6y75YFThX5K/2147948158/activate"}/>
+                               placeholder={"https://checkout.kajabi.com/webhooks/offers/Z6agK6y75YFThX5K/2147948158/activate"}/>
                     </Form.Item>
                     <Form.Item
                         label="Kajabi Webhook Deactivation URL:"
@@ -118,10 +138,11 @@ export default function NewProject() {
                         ]}
                     >
                         <Input ref={deactivationUrlRef}
-                            placeholder={"https://checkout.kajabi.com/webhooks/offers/Z6agK6y75YFThX5K/2147948158/deactivate"}/>
+                               placeholder={"https://checkout.kajabi.com/webhooks/offers/Z6agK6y75YFThX5K/2147948158/deactivate"}/>
                     </Form.Item>
 
                     <Form.Item
+                        valuePropName="checked"
                         label="Make project publicly available:"
                         name="isPublic"
                     >
@@ -129,7 +150,8 @@ export default function NewProject() {
                     </Form.Item>
 
                     <Button disabled={isLoading} type="primary" onClick={onCreateClick}>
-                        Create
+                        {existingProject && "Update"}
+                        {!existingProject && "Create"}
                     </Button>
                 </Form>
             </Card>

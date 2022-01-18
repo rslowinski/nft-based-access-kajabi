@@ -60,7 +60,7 @@ export default function Projects() {
     }, [user])
 
     function editProject(project) {
-
+        history.push('/new-project', {project: project.attributes, id: project.id})
     }
 
     return (
@@ -75,7 +75,7 @@ export default function Projects() {
             {isLoading && <Card style={styles.card} loading={isLoading}/>}
             {isLoading && <Card style={styles.card} loading={isLoading}/>}
             {projects.map(p => {
-                return <Card title={p.get("name")} hoverable style={styles.card} onClick={editProject(p)}>
+                return <Card title={p.get("name")} hoverable style={styles.card} onClick={() => editProject(p)}>
                     <div style={styles.cardContent}>
                         is publicly available: <Checkbox disabled checked={p.get("isPublic")}/>
                     </div>
