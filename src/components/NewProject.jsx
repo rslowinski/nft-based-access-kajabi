@@ -1,5 +1,5 @@
 import {Alert, Button, Card, Checkbox, Form, Input, Typography} from "antd";
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {ReactComponent as PlusIcon} from "../plus.svg";
 import Moralis from "moralis";
@@ -29,13 +29,15 @@ const styles = {
 };
 
 export default function NewProject() {
+    const {user} = useMoralis();
     const [alertInfo, setAlertInfo] = useState('')
     const [componentSize, setComponentSize] = useState('default');
     const [isLoading, setIsLoading] = useState(false)
+    const projectNameRef = useRef();
+    const activationUrlRef = useRef();
+    const deactivationUrlRef = useRef();
+    const isPublicRef = useRef();
 
-    const onFormLayoutChange = ({size}) => {
-        setComponentSize(size);
-    };
 
     async function onCreateClick(e) {
         setIsLoading(true)
@@ -43,8 +45,17 @@ export default function NewProject() {
         e.preventDefault();
 
         try {
-            const result = await Moralis.Cloud.run("HelloWorld")
-            setAlertInfo(result);
+            // const result = await Moralis.Cloud.run("HelloWorld")
+            const Project = new Moralis.Object.extend("Project");
+            const project = new Project();
+
+            project.set("owner", user)
+            project.set("name", projectNameRef.current.input.value)
+            project.set("kajabiActivationUrl", activationUrlRef.current.input.value)
+            project.set("kajabiDeactivationUrl", deactivationUrlRef.current.input.value)
+            project.set("isPublic", isPublicRef.current.input.checked || false)
+
+            await project.save()
 
         } catch(e) {
             setAlertInfo("Sth went wrong :(")
@@ -66,10 +77,6 @@ export default function NewProject() {
                         span: 28,
                     }}
                     layout="vertical"
-                    initialValues={{
-                        size: componentSize,
-                    }}
-                    onValuesChange={onFormLayoutChange}
                     size={componentSize}
                 >
 
@@ -83,7 +90,7 @@ export default function NewProject() {
                             },
                         ]}
                     >
-                        <Input/>
+                        <Input ref={projectNameRef}/>
                     </Form.Item>
 
                     <Form.Item
@@ -97,7 +104,7 @@ export default function NewProject() {
                             },
                         ]}
                     >
-                        <Input
+                        <Input ref={activationUrlRef}
                             placeholder={"https://checkout.kajabi.com/webhooks/offers/Z6agK6y75YFThX5K/2147948158/activate"}/>
                     </Form.Item>
                     <Form.Item
@@ -111,7 +118,7 @@ export default function NewProject() {
                             },
                         ]}
                     >
-                        <Input
+                        <Input ref={deactivationUrlRef}
                             placeholder={"https://checkout.kajabi.com/webhooks/offers/Z6agK6y75YFThX5K/2147948158/deactivate"}/>
                     </Form.Item>
 
@@ -119,7 +126,7 @@ export default function NewProject() {
                         label="Make project publicly available:"
                         name="isPublic"
                     >
-                        <Checkbox/>
+                        <Checkbox ref={isPublicRef}/>
                     </Form.Item>
 
                     <Button disabled={isLoading} type="primary" onClick={onCreateClick}>
