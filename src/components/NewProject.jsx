@@ -1,8 +1,7 @@
 import {Alert, Button, Card, Checkbox, Form, Input, Typography} from "antd";
 import React, {useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
-import {ReactComponent as PlusIcon} from "../plus.svg";
-import Moralis from "moralis";
+import {useHistory} from "react-router";
 
 const {Text} = Typography;
 
@@ -29,14 +28,14 @@ const styles = {
 };
 
 export default function NewProject() {
-    const {user} = useMoralis();
+    const {user, Moralis} = useMoralis();
     const [alertInfo, setAlertInfo] = useState('')
-    const [componentSize, setComponentSize] = useState('default');
     const [isLoading, setIsLoading] = useState(false)
     const projectNameRef = useRef();
     const activationUrlRef = useRef();
     const deactivationUrlRef = useRef();
     const isPublicRef = useRef();
+    const history = useHistory();
 
 
     async function onCreateClick(e) {
@@ -56,6 +55,7 @@ export default function NewProject() {
             project.set("isPublic", isPublicRef.current.input.checked || false)
 
             await project.save()
+            history.push("/projects")
 
         } catch(e) {
             setAlertInfo("Sth went wrong :(")
@@ -77,7 +77,6 @@ export default function NewProject() {
                         span: 28,
                     }}
                     layout="vertical"
-                    size={componentSize}
                 >
 
                     <Form.Item

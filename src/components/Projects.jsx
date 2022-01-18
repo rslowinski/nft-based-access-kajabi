@@ -1,5 +1,5 @@
-import {Card, Image, Typography} from "antd";
-import React from "react";
+import {Card, Checkbox, Image, Typography} from "antd";
+import React, {useEffect, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {ReactComponent as PlusIcon} from "../plus.svg";
 import {useHistory} from "react-router";
@@ -19,7 +19,7 @@ const styles = {
         border: "1px solid #e7eaf3",
         borderRadius: "0.5rem",
         width: "16rem",
-        height: "100%",
+        height: "12rem",
         minHeight: "10rem",
     },
     cardContent: {
@@ -35,22 +35,52 @@ const styles = {
 };
 
 export default function Projects() {
-    const {Moralis} = useMoralis();
+    const {user, Moralis} = useMoralis();
     const history = useHistory()
+    const [projects, setProjects] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
     function addNewProject() {
         history.push("/new-project")
     }
 
+    useEffect(async () => {
+        setIsLoading(true)
+        try {
+            const Project = Moralis.Object.extend("Project");
+            const query = new Moralis.Query(Project);
+            query.equalTo("owner", user);
+            const projects = await query.find();
+            setProjects(projects)
+        } catch (e) {
+            console.error("Sth went wrong. " + e)
+        } finally {
+            setIsLoading(false)
+        }
+    }, [user])
+
+    function editProject(project) {
+
+    }
+
     return (
-        <div style={{display: "flex", gap: "10px"}}>
-            <Card hoverable style={styles.card} onClick={addNewProject} >
+        <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
+            <Card hoverable style={styles.card} onClick={addNewProject}>
                 <div style={styles.cardContent}>
                     <PlusIcon style={styles.plusIcon}/>
                     <br/>
                     <p><strong>Add a new project</strong></p>
                 </div>
             </Card>
+            {isLoading && <Card style={styles.card} loading={isLoading}/>}
+            {isLoading && <Card style={styles.card} loading={isLoading}/>}
+            {projects.map(p => {
+                return <Card title={p.get("name")} hoverable style={styles.card} onClick={editProject(p)}>
+                    <div style={styles.cardContent}>
+                        is publicly available: <Checkbox disabled checked={p.get("isPublic")}/>
+                    </div>
+                </Card>
+            })}
         </div>
     );
 }
