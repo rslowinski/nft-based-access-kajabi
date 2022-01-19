@@ -1,5 +1,5 @@
-import {Button, Card, Checkbox, Descriptions, Image, Typography} from "antd";
-import React, {useCallback, useEffect, useState} from "react";
+import {Alert, Button, Card, Checkbox, Descriptions, Form, Image, Input, Typography} from "antd";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {ReactComponent as PlusIcon} from "../plus.svg";
 import {useHistory, useLocation} from "react-router";
@@ -21,7 +21,7 @@ const styles = {
         border: "1px solid #e7eaf3",
         borderRadius: "0.5rem",
         width: "32rem",
-        height: "12rem",
+        height: "18rem",
         minHeight: "10rem",
     },
     cardContent: {
@@ -38,11 +38,12 @@ const styles = {
 
 export default function PublicProjectDetails(props) {
     const {Moralis, isAuthenticated} = useMoralis();
-    // const projectId = props?.match?.params?.projectId
     const [project, setProject] = useState();
     const [projectId, setProjectId] = useState();
     const [isEligible, setIsEligible] = useState(false);
     const [nothingFound, setNothingFound] = useState();
+    const [info, setInfo] = useState();
+    const emailRef = useRef();
 
     useEffect(async () => {
         try {
@@ -61,6 +62,20 @@ export default function PublicProjectDetails(props) {
         }
     }, [props.match.params])
 
+    const submitEmail = async (e) => {
+        e.preventDefault();
+        setInfo("")
+
+        if (emailRef.current?.input?.value) {
+            try{
+            await Moralis.Cloud.run("blah", {projectId: projectId, email: emailRef.current.input.value})
+                setInfo("Email added successfuly - wait for further instruction")
+            } catch (e) {
+                setInfo("Sth went wrong...")
+            }
+        }
+    }
+
 
     const fetchProject = useCallback(async () => {
         const result = await Moralis.Cloud.run("HelloWorld", {projectId: projectId})
@@ -77,6 +92,7 @@ export default function PublicProjectDetails(props) {
 
     return (
         <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
+            {info && <Alert message={info}/>}
             {project && <Card style={styles.card}>
 
                 <Descriptions title={"Project info"}>
@@ -91,11 +107,35 @@ export default function PublicProjectDetails(props) {
 
                 {isAuthenticated &&
                 <div>
-                    Eligibility status:
-                    {!isEligible &&
-                    <CloseCircleOutlined style={{marginLeft: "0.5rem", fontSize: '20px', color: 'red'}}/>}
+
                     {isEligible &&
-                    <CheckCircleOutlined style={{marginLeft: "0.5rem", fontSize: '20px', color: 'green'}}/>}
+                    <div> Eligibility status: <CloseCircleOutlined
+                        style={{marginLeft: "0.5rem", fontSize: '20px', color: 'red'}}/></div>}
+                    {!isEligible &&
+                    <div>
+                        Eligibility status: <CheckCircleOutlined
+                        style={{marginLeft: "0.5rem", fontSize: '20px', color: 'green'}}/>
+                        <Form layout="vertical">
+                            <Form.Item label="E-mail that will receive access to the project:">
+                                <Input.Group compact>
+                                    <Form.Item email name="email" style={{width: 'calc(100% - 8rem)'}}
+                                               rules={[
+                                                   {
+                                                       required: true,
+                                                       type: "email",
+                                                       message: "Incorrect email"
+                                                   },
+                                               ]}
+                                    >
+                                        <Input ref={emailRef}/>
+                                    </Form.Item>
+                                    <Button style={{width: '8rem'}} onClick={submitEmail}>Submit</Button>
+                                </Input.Group>
+                            </Form.Item>
+
+                        </Form>
+                    </div>
+                    }
                 </div>}
 
             </Card>}
