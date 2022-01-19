@@ -1,9 +1,10 @@
-import {Alert, Button, Card, Checkbox, Form, Input, Popconfirm, Space, Table} from "antd";
-import React, {useEffect, useImperativeHandle, useRef, useState} from "react";
+import {Alert, Button, Card, Checkbox, Descriptions, Form, Input, Modal, Popconfirm, Space, Table} from "antd";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {useHistory, useLocation} from "react-router";
 import Moralis from "moralis";
 import AddressInput from "./AddressInput";
+import Text from "antd/es/typography/Text";
 
 const styles = {
     title: {
@@ -28,7 +29,7 @@ const styles = {
         height: "100%",
         width: "32rem",
         // marginTop: "6rem",
-        marginLeft: "0.5rem"
+        // marginLeft: "0.5rem"
     },
     plusIcon: {
         width: "5rem",
@@ -48,20 +49,33 @@ export default function NewProject() {
     const [alertInfo, setAlertInfo] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [isSearching, setIsSearching] = useState(false)
-    const [showNftSettings, setShowNftSettings] = useState(false)
+    const [showModal, setShowModal] = useState(false)
     const [foundNfts, setFoundNfts] = useState([])
+    const [nftMeta, setNftMeta] = useState('')
+    const [selectedNftAddr, setSelectedNftAddr] = useState('')
     const [nftContractAddress, setNftContractAddress] = useState();
     const projectNameRef = useRef();
     const activationUrlRef = useRef();
     const deactivationUrlRef = useRef();
     const requiredNftRef = useRef();
     const nftSearchInput = useRef();
-    const nftReqRef = useRef();
     const isPublicRef = useRef();
     const history = useHistory();
     const location = useLocation();
     const existingProject = location.state?.project;
     const [form] = Form.useForm();
+
+    useEffect(async () => {
+        try {
+            debugger
+            const result = await Moralis.Web3API.token.getNFTMetadata({address: selectedNftAddr})
+            setNftMeta(result)
+        } catch (e) {
+            console.log()
+        } finally {
+
+        }
+    },[selectedNftAddr]);
 
     async function onDeleteClick(e) {
         e.preventDefault();
@@ -147,11 +161,7 @@ export default function NewProject() {
             project.set("kajabiDeactivationUrl", deactivationUrlRef.current.input.value)
             project.set("isPublic", isPublicRef.current.input.checked || false)
 
-            if (showNftSettings) {
-                project.set("requiredNftAddr", requiredNftRef?.current?.input?.value)
-            } else {
-                project.set("requiredNftAddr", "")
-            }
+            project.set("requiredNftAddr", requiredNftRef?.current?.input?.value)
 
             await project.save()
 
@@ -166,14 +176,6 @@ export default function NewProject() {
             console.error("Sth went wrong." + e)
         } finally {
             setIsLoading(false)
-        }
-    };
-
-    const onShowNftSettings = () => {
-        if (nftReqRef?.current?.input?.checked) {
-            setShowNftSettings(true)
-        } else {
-            setShowNftSettings(false)
         }
     };
 
@@ -247,20 +249,18 @@ export default function NewProject() {
                         <Checkbox ref={isPublicRef}/>
                     </Form.Item>
 
-                    <Form.Item
-                        valuePropName="checked"
-                        label="Add NFT requirements"
-                        name="nftReq"
-                    >
-                        <Checkbox onClick={onShowNftSettings} ref={nftReqRef}/>
+                    <Form.Item label="Require NFT from collection:">
+                        <Input.Group compact>
+                            <Form.Item name="requiredNftAddress" style={{width: 'calc(100% - 8rem)'}}>
+                                <Input disabled ref={requiredNftRef}/>
+                            </Form.Item>
+                            <Button style={{width: '8rem'}} onClick={() => setShowModal(true)}>NFT Search </Button>
+                            {nftMeta && <Descriptions title={"NFT Collection Info:"}>
+                                <Descriptions.Item label={"name"}>{nftMeta.name}</Descriptions.Item>
+                                <Descriptions.Item label={"symbol"}>{nftMeta.symbol}</Descriptions.Item>
+                            </Descriptions>}
+                        </Input.Group>
                     </Form.Item>
-
-                    {onShowNftSettings && <Form.Item
-                        label="Required NFT from collection:"
-                        name="requiredNftAddress"
-                    >
-                        <Input disabled ref={requiredNftRef}/>
-                    </Form.Item>}
 
                     <Button style={styles.updateButton} disabled={isLoading || isSearching} type="primary"
                             onClick={onCreateClick}>
@@ -277,58 +277,62 @@ export default function NewProject() {
                     </Popconfirm>}
                 </Form>
             </Card>
-            {showNftSettings &&
-            <div>
-                <Card title="NFT Requirements" style={styles.nftCard}>
-                    <Form
-                        labelCol={{
-                            span: 28,
-                        }}
-                        wrapperCol={{
-                            span: 28,
-                        }}
-                        layout="vertical">
+            <Modal width={"35rem"} visible={showModal} onOk={() => setShowModal(false)}
+                   onCancel={() => setShowModal(false)}>
+                <div>
+                    <Card title="NFT Requirements" style={styles.nftCard}>
+                        <Form
+                            labelCol={{
+                                span: 28,
+                            }}
+                            wrapperCol={{
+                                span: 28,
+                            }}
+                            layout="vertical">
 
-                        <Form.Item
-                            label="Search collection by keywords:"
-                            name="nftSearchInput"
-                        >
-                            <Input ref={nftSearchInput} placeholder={"fancy bears"}/>
-                        </Form.Item>
+                            <Form.Item
+                                label="Search collection by name:"
+                                name="nftSearchInput"
+                            >
+                                <Input ref={nftSearchInput} placeholder={"fancy bears"}/>
+                            </Form.Item>
 
-                        <Form.Item
-                            label="Alternatively search collection by it's contract address:"
-                            name="nftContractAddress"
-                        >
-                            <AddressInput onChange={setNftContractAddress}
-                                          placeholder={"0x87084ec881d5A15C918057F326790dB177D218F2"}/>
-                        </Form.Item>
+                            <Form.Item
+                                label="Alternatively search collection by it's contract address:"
+                                name="nftContractAddress"
+                            >
+                                <AddressInput onChange={setNftContractAddress}
+                                              placeholder={"0x87084ec881d5A15C918057F326790dB177D218F2"}/>
+                            </Form.Item>
 
-                        <Button loading={isSearching} type="secondary" onClick={nftSearch}>Search</Button>
-                    </Form>
-                    <br/>
-                    {foundNfts &&
-                    <div>
-                        <Table
-                            columns={[
-                                {title: 'Address', dataIndex: 'address', 'key': 'address'},
-                                {
-                                    title: 'Action', key: 'action', render: (text, record) => (
-                                        <Space size="middle"
-                                               onClick={() => {
-                                                   form.setFieldsValue({requiredNftAddress: record.address})
-                                               }}><a>select</a></Space>
-                                    )
-                                },
-                            ]}
-                            dataSource={foundNfts.map(nft => {
-                                return {address: nft, dataIndex: nft, 'key': nft}
-                            })}/>
-                    </div>
-                    }
-                </Card>
-            </div>
-            }
+                            <Button loading={isSearching} type="secondary" onClick={nftSearch}>Search</Button>
+                        </Form>
+                        <br/>
+                        {foundNfts &&
+                        <div>
+                            <Table
+                                columns={[
+                                    {title: 'Address', dataIndex: 'address', 'key': 'address'},
+                                    {
+                                        title: 'Action', key: 'action', render: (text, record) => (
+                                            <Space size="middle"
+                                                   onClick={() => {
+                                                       form.setFieldsValue({requiredNftAddress: record.address})
+                                                       setSelectedNftAddr(record.address)
+                                                       setShowModal(false)
+                                                   }}><a>select</a></Space>
+                                        )
+                                    },
+                                ]}
+                                dataSource={foundNfts.map(nft => {
+                                    return {address: nft, dataIndex: nft, 'key': nft}
+                                })}/>
+                        </div>
+                        }
+                    </Card>
+                </div>
+            </Modal>
+
         </div>
     );
 }
