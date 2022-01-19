@@ -1,5 +1,5 @@
-import {Alert, Button, Card, Checkbox, Form, Input} from "antd";
-import React, {useCallback, useRef, useState} from "react";
+import {Alert, Button, Card, Checkbox, Form, Input, Popconfirm} from "antd";
+import React, {useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {useHistory, useLocation} from "react-router";
 import Moralis from "moralis";
@@ -23,6 +23,13 @@ const styles = {
     plusIcon: {
         width: "5rem",
         height: "5rem"
+    },
+    deleteButton: {
+        width: "100%",
+        marginTop: "1rem",
+    },
+    updateButton: {
+        width: "100%"
     }
 };
 
@@ -38,6 +45,30 @@ export default function NewProject() {
     const location = useLocation();
     const existingProject = location.state?.project;
 
+
+    async function onDeleteClick(e) {
+        e.preventDefault();
+        setIsLoading(true)
+        setAlertInfo("")
+
+        try {
+            const Project = new Moralis.Object.extend("Project");
+            let project = new Project();
+            project.set("id", location.state.id)
+
+            if (!project.isDataAvailable()) {
+                project = await project.fetch();
+            }
+
+            await project.destroy()
+            history.push("/projects")
+        } catch (e) {
+            setAlertInfo("Sth went wrong - can't delete")
+            console.error(e)
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     async function onCreateClick(e) {
         setIsLoading(true)
@@ -149,10 +180,17 @@ export default function NewProject() {
                         <Checkbox ref={isPublicRef}/>
                     </Form.Item>
 
-                    <Button disabled={isLoading} type="primary" onClick={onCreateClick}>
+                    <Button style={styles.updateButton} disabled={isLoading} type="primary" onClick={onCreateClick}>
                         {existingProject && "Update"}
                         {!existingProject && "Create"}
                     </Button>
+
+                    {existingProject &&
+                    <Popconfirm disabled={isLoading} title="It can't be reverted, are you sure?" onConfirm={onDeleteClick} >
+                        <Button danger style={styles.deleteButton} >
+                            Delete project
+                        </Button>
+                    </Popconfirm>}
                 </Form>
             </Card>
         </div>
