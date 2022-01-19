@@ -276,8 +276,8 @@ export default function NewProject() {
                             </Form.Item>
                             <Button style={{width: '8rem'}} onClick={() => setShowModal(true)}>NFT Search </Button>
                             {nftMeta && <Descriptions title={"NFT Collection Info:"}>
-                                <Descriptions.Item label={"name"}>{nftMeta.name}</Descriptions.Item>
-                                <Descriptions.Item label={"symbol"}>{nftMeta.symbol}</Descriptions.Item>
+                                <Descriptions.Item label={"name"}>{nftMeta.name || "?"}</Descriptions.Item>
+                                <Descriptions.Item label={"symbol"}>{nftMeta.symbol || "?"}</Descriptions.Item>
                             </Descriptions>}
                         </Input.Group>
                     </Form.Item>

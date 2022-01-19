@@ -19,7 +19,7 @@ const styles = {
         boxShadow: "0 0.5rem 1.2rem rgb(189 197 209 / 20%)",
         border: "1px solid #e7eaf3",
         borderRadius: "0.5rem",
-        width: "16rem",
+        width: "22rem",
         height: "12rem",
         minHeight: "10rem",
     },
@@ -79,7 +79,7 @@ export default function Projects() {
                 return <Card title={p.get("name")} hoverable style={styles.card} onClick={() => editProject(p)}>
                     <div style={styles.cardContent}>
                         <span>is publicly available: <Checkbox disabled checked={p.get("isPublic")}/></span>
-                        <span>Required NFT: {p.get("requiredNftName") || "None"}</span>
+                        <span>Required NFT: {p.get("requiredNftName") || (p.get("requiredNftAddress") || "?")}</span>
                         {p.get("isPublic") && <span onClick={(e) => {e.stopPropagation()}}><Link to={"/project/"+p.id}>Project page</Link></span>}
                     </div>
                 </Card>

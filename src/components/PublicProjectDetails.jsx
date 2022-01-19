@@ -83,12 +83,14 @@ export default function PublicProjectDetails(props) {
         await checkEligibility()
     }, [projectId])
 
-    const checkEligibility = useCallback(async () => {
+    const checkEligibility = (async () => {
+        if (!project) return
         const requiredNfts = await Moralis.Web3API.account.getNFTsForContract({token_address: project.requiredNftAddress})
+        debugger
         console.log("has required nfts:" + requiredNfts.result.join(","))
         setIsEligible(requiredNfts.result.length > 0)
 
-    }, [project]);
+    });
 
     return (
         <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
@@ -96,8 +98,8 @@ export default function PublicProjectDetails(props) {
             {project && <Card style={styles.card}>
 
                 <Descriptions title={"Project info"}>
-                    <Descriptions.Item label={"project name"}>{project.name}</Descriptions.Item>
-                    <Descriptions.Item label={"required nft"}>{project.requiredNftName}</Descriptions.Item>
+                    <Descriptions.Item label={"project name"}>{project.name || "?"}</Descriptions.Item>
+                    <Descriptions.Item label={"required nft"}>{project.requiredNftName || (project.requiredNftAddress || "?")}</Descriptions.Item>
                 </Descriptions>
 
                 {!isAuthenticated &&
@@ -108,10 +110,10 @@ export default function PublicProjectDetails(props) {
                 {isAuthenticated &&
                 <div>
 
-                    {isEligible &&
+                    {!isEligible &&
                     <div> Eligibility status: <CloseCircleOutlined
                         style={{marginLeft: "0.5rem", fontSize: '20px', color: 'red'}}/></div>}
-                    {!isEligible &&
+                    {isEligible &&
                     <div>
                         Eligibility status: <CheckCircleOutlined
                         style={{marginLeft: "0.5rem", fontSize: '20px', color: 'green'}}/>
