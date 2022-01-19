@@ -10,6 +10,7 @@ import MenuItems from "./components/MenuItems";
 import {ReactComponent as AppLogo} from './logo.svg';
 import Projects from "./components/Projects";
 import NewProject from "./components/NewProject";
+import PublicProjectDetails from "./components/PublicProjectDetails";
 
 const {Header, Footer} = Layout;
 
@@ -72,6 +73,7 @@ const App = ({isServerInfo}) => {
                         <Route path="/new-project">
                             <NewProject/>
                         </Route>
+                        <Route path="/project/:projectId" component={PublicProjectDetails}/>
                     </Switch>
                 </div>
             </Router>

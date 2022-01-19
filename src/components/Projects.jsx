@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {ReactComponent as PlusIcon} from "../plus.svg";
 import {useHistory} from "react-router";
+import {Link} from "react-router-dom";
 
 const {Text} = Typography;
 
@@ -79,6 +80,7 @@ export default function Projects() {
                     <div style={styles.cardContent}>
                         <span>is publicly available: <Checkbox disabled checked={p.get("isPublic")}/></span>
                         <span>Required NFT: {p.get("requiredNftName") || "None"}</span>
+                        {p.get("isPublic") && <span onClick={(e) => {e.stopPropagation()}}><Link to={"/project/"+p.id}>Project page</Link></span>}
                     </div>
                 </Card>
             })}
