@@ -12,6 +12,7 @@ import Projects from "./components/Projects";
 import NewProject from "./components/NewProject";
 import PublicProjectDetails from "./components/PublicProjectDetails";
 import Start from "./components/Start";
+import CreateCollection from "./components/CreateCollection";
 
 const {Header, Footer} = Layout;
 
@@ -76,6 +77,9 @@ const App = ({isServerInfo}) => {
                         </Route>
                         <Route path="/new-project">
                             <NewProject/>
+                        </Route>
+                        <Route path="/create-collection">
+                            <CreateCollection/>
                         </Route>
                         <Route path="/project/:projectId" component={PublicProjectDetails}/>
                     </Switch>

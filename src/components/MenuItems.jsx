@@ -24,6 +24,9 @@ function MenuItems() {
       <Menu.Item key="/projects">
         <NavLink to="/projects">💾 Projects</NavLink>
       </Menu.Item>
+      <Menu.Item key="/create-collection">
+        <NavLink to="/create-collection">🧰 Create collection</NavLink>
+      </Menu.Item>
     </Menu>
   );
 }
