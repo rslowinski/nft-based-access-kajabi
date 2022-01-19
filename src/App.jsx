@@ -11,6 +11,7 @@ import {ReactComponent as AppLogo} from './logo.svg';
 import Projects from "./components/Projects";
 import NewProject from "./components/NewProject";
 import PublicProjectDetails from "./components/PublicProjectDetails";
+import Start from "./components/Start";
 
 const {Header, Footer} = Layout;
 
@@ -67,6 +68,9 @@ const App = ({isServerInfo}) => {
 
                 <div style={styles.content}>
                     <Switch>
+                        <Route exact path={"/"}>
+                            <Start/>
+                        </Route>
                         <Route path="/projects">
                             <Projects/>
                         </Route>
