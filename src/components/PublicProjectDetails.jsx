@@ -38,8 +38,9 @@ const styles = {
 
 export default function PublicProjectDetails(props) {
     const {Moralis, isAuthenticated} = useMoralis();
-    const projectId = props?.match?.params?.projectId
+    // const projectId = props?.match?.params?.projectId
     const [project, setProject] = useState();
+    const [projectId, setProjectId] = useState();
     const [isEligible, setIsEligible] = useState(false);
     const [nothingFound, setNothingFound] = useState();
 
@@ -52,20 +53,24 @@ export default function PublicProjectDetails(props) {
         } finally {
         }
 
+    }, [projectId])
+
+    useEffect(() => {
+        if (props?.match?.params?.projectId) {
+            setProjectId(props.match.params.projectId)
+        }
     }, [props.match.params])
 
+
     const fetchProject = useCallback(async () => {
-        const Project = Moralis.Object.extend("Project");
-        const query = new Moralis.Query(Project);
-        query.equalTo("isPublic", true)
-        query.equalTo("objectId", projectId)
-        const result = await query.first()
+        const result = await Moralis.Cloud.run("HelloWorld", {projectId: projectId})
         setProject(result)
         await checkEligibility()
-    }, [])
+    }, [projectId])
 
     const checkEligibility = useCallback(async () => {
-        const requiredNfts = await Moralis.Web3API.account.getNFTsForContract({token_address: project.get("requiredNftAddress")})
+        const requiredNfts = await Moralis.Web3API.account.getNFTsForContract({token_address: project.requiredNftAddress})
+        console.log("has required nfts:" + requiredNfts.result.join(","))
         setIsEligible(requiredNfts.result.length > 0)
 
     }, [project]);
@@ -75,8 +80,8 @@ export default function PublicProjectDetails(props) {
             {project && <Card style={styles.card}>
 
                 <Descriptions title={"Project info"}>
-                    <Descriptions.Item label={"project name"}>{project.get("name")}</Descriptions.Item>
-                    <Descriptions.Item label={"required nft"}>{project.get("requiredNftName")}</Descriptions.Item>
+                    <Descriptions.Item label={"project name"}>{project.name}</Descriptions.Item>
+                    <Descriptions.Item label={"required nft"}>{project.requiredNftName}</Descriptions.Item>
                 </Descriptions>
 
                 {!isAuthenticated &&
