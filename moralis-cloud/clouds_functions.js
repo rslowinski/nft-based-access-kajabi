@@ -26,13 +26,14 @@ Moralis.Cloud.define("blah", async(req) => {
     const userNft = await Moralis.Web3API.account.getNFTsForContract({address: userAddr,token_address: result.get("requiredNftAddress")})
 
     if(userNft.result.length <= 0){
-//  	return {result: (userAddr + " doesnt have required nft")}
+        throw "user doesnt have required nft"
     }
 
     const AccessMint = Moralis.Object.extend("AccessMint");
     const accessMintQuery = new Moralis.Query("AccessMint");
     accessMintQuery.equalTo("ownerAddr", userAddr)
     accessMintQuery.equalTo("project", project)
+
     const existingAMs = await accessMintQuery.first()
     if (existingAMs){
         throw "Conflict! Access already received."
@@ -41,6 +42,8 @@ Moralis.Cloud.define("blah", async(req) => {
     const accessMint = new AccessMint();
     accessMint.set("ownerAddr", userAddr)
     accessMint.set("ownerEmail", userEmail)
+    accessMint.set("nftAddr", userNft.result[0].token_address)
+    accessMint.set("nftTokenId", userNft.result[0].token_id)
     accessMint.set("project", result)
     await accessMint.save()
 
@@ -57,12 +60,33 @@ Moralis.Cloud.define("blah", async(req) => {
         console.log(httpResponse.text);
     }, function(httpResponse) {
         console.error('Request failed with response code ' + httpResponse.status);
-        return httpRespose
+        throw ("Kajabi request failed. " + httpResponse.status)
     });
 
-    return 200;
-});
+    const conflictingAMs = new Moralis.Query("AccessMint");
+    conflictingAMs.equalTo("nftAddr", userNft.result[0].token_address)
+    conflictingAMs.equalTo("nftTokenId", userNft.result[0].token_id)
+    conflictingAMs.notEqualTo("ownerAddr", userAddr)
+    const foundConflict = await conflictingAMs.first()
 
-Moralis.Cloud.afterSave("AccessMint", (request) => {
-    return request
+    if(foundConflict){
+        Moralis.Cloud.httpRequest({
+            method: 'POST',
+            url: project.get("kajabiDeactivationUrl"),
+            body: {
+                email: foundConflict.get("ownerEmail"),
+                name: foundConflict.get("ownerEmail"),
+                external_user_id: foundConflict.get("ownerEmail")
+            }
+        }).then(function(httpResponse) {
+            console.log(httpResponse.text);
+        }, function(httpResponse) {
+            console.error('Request failed with response code ' + httpResponse.status);
+            throw ("Kajabi request failed. " + httpResponse.status)
+        });
+
+        await foundConflict.destroy()
+    }
+
+    return 200;
 });

@@ -51,6 +51,7 @@ export default function Projects() {
             const Project = Moralis.Object.extend("Project");
             const query = new Moralis.Query(Project);
             query.equalTo("owner", user);
+            query.notEqualTo()
             const projects = await query.find();
             setProjects(projects)
         } catch (e) {
