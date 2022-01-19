@@ -1,10 +1,9 @@
 import {Alert, Button, Card, Checkbox, Descriptions, Form, Input, Modal, Popconfirm, Space, Table} from "antd";
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {useHistory, useLocation} from "react-router";
 import Moralis from "moralis";
 import AddressInput from "./AddressInput";
-import Text from "antd/es/typography/Text";
 
 const styles = {
     title: {
@@ -67,15 +66,34 @@ export default function NewProject() {
 
     useEffect(async () => {
         try {
-            debugger
             const result = await Moralis.Web3API.token.getNFTMetadata({address: selectedNftAddr})
-            setNftMeta(result)
+            setNftMeta({name: result.name, symbol: result.symbol, address: selectedNftAddr})
         } catch (e) {
             console.log()
         } finally {
 
         }
-    },[selectedNftAddr]);
+    }, [selectedNftAddr]);
+
+    useEffect(async () => {
+        if (existingProject) {
+            const Project = new Moralis.Object.extend("Project");
+            let project = new Project();
+            project.set("id", location.state.id)
+
+            if (!project.isDataAvailable()) {
+                project = await project.fetch();
+            }
+            setNftMeta(setNftMeta({
+                name: project.get("requiredNftName"),
+                symbol: project.get("requiredNftSymbol"),
+                address: project.get("requiredNftAddress")
+            }))
+
+            form.setFieldsValue({requiredNftAddress: project.get("requiredNftAddress")})
+            setSelectedNftAddr(project.get("requiredNftAddress"))
+        }
+    }, [])
 
     async function onDeleteClick(e) {
         e.preventDefault();
@@ -161,7 +179,9 @@ export default function NewProject() {
             project.set("kajabiDeactivationUrl", deactivationUrlRef.current.input.value)
             project.set("isPublic", isPublicRef.current.input.checked || false)
 
-            project.set("requiredNftAddr", requiredNftRef?.current?.input?.value)
+            project.set("requiredNftAddress", nftMeta.address)
+            project.set("requiredNftName", nftMeta.name)
+            project.set("requiredNftSymbol", nftMeta.symbol)
 
             await project.save()
 

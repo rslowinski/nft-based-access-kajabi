@@ -77,7 +77,8 @@ export default function Projects() {
             {projects.map(p => {
                 return <Card title={p.get("name")} hoverable style={styles.card} onClick={() => editProject(p)}>
                     <div style={styles.cardContent}>
-                        is publicly available: <Checkbox disabled checked={p.get("isPublic")}/>
+                        <span>is publicly available: <Checkbox disabled checked={p.get("isPublic")}/></span>
+                        <span>Required NFT: {p.get("requiredNftName") || "None"}</span>
                     </div>
                 </Card>
             })}
