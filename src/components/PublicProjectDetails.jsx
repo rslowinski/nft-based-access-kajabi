@@ -21,7 +21,7 @@ const styles = {
         border: "1px solid #e7eaf3",
         borderRadius: "0.5rem",
         width: "32rem",
-        height: "18rem",
+        height: "24rem",
         minHeight: "10rem",
     },
     cardContent: {
@@ -41,17 +41,20 @@ export default function PublicProjectDetails(props) {
     const [project, setProject] = useState();
     const [projectId, setProjectId] = useState();
     const [isEligible, setIsEligible] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [nothingFound, setNothingFound] = useState();
     const [info, setInfo] = useState();
     const emailRef = useRef();
 
     useEffect(async () => {
         try {
+            setIsLoading(true)
             await fetchProject(projectId)
         } catch (e) {
             console.log(e)
             setNothingFound(true)
         } finally {
+            setIsLoading(false)
         }
 
     }, [projectId])
@@ -67,8 +70,8 @@ export default function PublicProjectDetails(props) {
         setInfo("")
 
         if (emailRef.current?.input?.value) {
-            try{
-            await Moralis.Cloud.run("blah", {projectId: projectId, email: emailRef.current.input.value})
+            try {
+                await Moralis.Cloud.run("blah", {projectId: projectId, email: emailRef.current.input.value})
                 setInfo("Email added successfuly - wait for further instruction")
             } catch (e) {
                 setInfo("Sth went wrong...")
@@ -77,19 +80,26 @@ export default function PublicProjectDetails(props) {
     }
 
 
-    const fetchProject = useCallback(async () => {
-        const result = await Moralis.Cloud.run("HelloWorld", {projectId: projectId})
-        setProject(result)
-        await checkEligibility()
-    }, [projectId])
+    const fetchProject = (async () => {
+        try {
+            const result = await Moralis.Cloud.run("HelloWorld", {projectId: projectId})
+            setProject(result)
+            await checkEligibility()
+        } catch (e) {
+            console.log(e)
+        }
+    })
 
     const checkEligibility = (async () => {
         if (!project) return
-        const requiredNfts = await Moralis.Web3API.account.getNFTsForContract({token_address: project.requiredNftAddress})
-        debugger
-        console.log("has required nfts:" + requiredNfts.result.join(","))
-        setIsEligible(requiredNfts.result.length > 0)
-
+        try {
+            setIsLoading(true)
+            const requiredNfts = await Moralis.Web3API.account.getNFTsForContract({token_address: project.requiredNftAddress})
+            console.log("has required nfts:" + requiredNfts.result.join(","))
+            setIsEligible(requiredNfts.result.length > 0)
+        } catch (e) {}finally {
+            setIsLoading(false)
+        }
     });
 
     return (
@@ -99,7 +109,8 @@ export default function PublicProjectDetails(props) {
 
                 <Descriptions title={"Project info"}>
                     <Descriptions.Item label={"project name"}>{project.name || "?"}</Descriptions.Item>
-                    <Descriptions.Item label={"required nft"}>{project.requiredNftName || (project.requiredNftAddress || "?")}</Descriptions.Item>
+                    <Descriptions.Item
+                        label={"required nft"}>{project.requiredNftName || (project.requiredNftAddress || "?")}</Descriptions.Item>
                 </Descriptions>
 
                 {!isAuthenticated &&
@@ -108,11 +119,12 @@ export default function PublicProjectDetails(props) {
                 </span>}
 
                 {isAuthenticated &&
-                <div>
+                <Card loading={isLoading}>
 
                     {!isEligible &&
                     <div> Eligibility status: <CloseCircleOutlined
-                        style={{marginLeft: "0.5rem", fontSize: '20px', color: 'red'}}/></div>}
+                        style={{marginLeft: "0.5rem", fontSize: '20px', color: 'red', marginRight: "1rem"}}/><Button
+                        disabled={isLoading} onClick={checkEligibility}>Refresh</Button></div>}
                     {isEligible &&
                     <div>
                         Eligibility status: <CheckCircleOutlined
@@ -138,7 +150,7 @@ export default function PublicProjectDetails(props) {
                         </Form>
                     </div>
                     }
-                </div>}
+                </Card>}
 
             </Card>}
             {!project && nothingFound && <h3>Nothing here...</h3>}
