@@ -53,7 +53,7 @@ export default function NewProject() {
                 project.set("id", location.state.id)
             }
 
-            if (!project.isDataAvailable()) {
+            if (existingProject && !project.isDataAvailable()) {
                 project = await project.fetch();
             }
 
