@@ -19,6 +19,7 @@ Moralis.Cloud.define("blah", async(req) => {
     query.equalTo("isPublic", true)
     query.equalTo("objectId", projectId)
     const result = await query.first()
+    const project = result;
 
     const userAddr = req.user.get("ethAddress")
 
@@ -29,13 +30,21 @@ Moralis.Cloud.define("blah", async(req) => {
     }
 
     const AccessMint = Moralis.Object.extend("AccessMint");
+    const accessMintQuery = new Moralis.Query("AccessMint");
+    accessMintQuery.equalTo("ownerAddr", userAddr)
+    accessMintQuery.equalTo("project", project)
+    const existingAMs = await accessMintQuery.first()
+    if (existingAMs){
+        throw "Conflict! Access already received."
+    }
+
     const accessMint = new AccessMint();
     accessMint.set("ownerAddr", userAddr)
     accessMint.set("ownerEmail", userEmail)
     accessMint.set("project", result)
     await accessMint.save()
 
-    const project = result;
+
     Moralis.Cloud.httpRequest({
         method: 'POST',
         url: project.get("kajabiActivationUrl"),
@@ -52,4 +61,8 @@ Moralis.Cloud.define("blah", async(req) => {
     });
 
     return 200;
+});
+
+Moralis.Cloud.afterSave("AccessMint", (request) => {
+    return request
 });

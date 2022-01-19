@@ -73,8 +73,8 @@ export default function PublicProjectDetails(props) {
             try {
                 await Moralis.Cloud.run("blah", {projectId: projectId, email: emailRef.current.input.value})
                 setInfo("Email added successfuly - wait for further instruction")
-            } catch (e) {
-                setInfo("Sth went wrong...")
+            } catch (err) {
+                setInfo("Sth went wrong... (" + (err || "") + ")")
             }
         }
     }
