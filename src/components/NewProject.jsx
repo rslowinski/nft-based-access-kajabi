@@ -166,8 +166,6 @@ export default function NewProject() {
         setAlertInfo("")
 
 
-
-
         try {
             // const result = await Moralis.Cloud.run("HelloWorld")
             const Project = new Moralis.Object.extend("Project");
@@ -187,10 +185,11 @@ export default function NewProject() {
             project.set("kajabiDeactivationUrl", deactivationUrlRef.current.input.value)
             project.set("isPublic", isPublicRef.current.input.checked || false)
 
-            project.set("requiredNftAddress", nftMeta.address)
-            project.set("requiredNftName", nftMeta.name)
-            project.set("requiredNftSymbol", nftMeta.symbol)
-
+            if (nftMeta) {
+                project.set("requiredNftAddress", nftMeta.address)
+                project.set("requiredNftName", nftMeta.name)
+                project.set("requiredNftSymbol", nftMeta.symbol)
+            }
             await project.save()
 
             if (existingProject) {
