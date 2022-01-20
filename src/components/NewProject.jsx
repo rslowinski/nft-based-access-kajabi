@@ -156,9 +156,17 @@ export default function NewProject() {
     }
 
     async function onCreateClick(e) {
+        e.preventDefault();
+        if (!(projectNameRef.current.input.value && activationUrlRef.current.input.value && deactivationUrlRef.current.input.value)) {
+            setAlertInfo("Not all fields are filled")
+            return
+        }
+
         setIsLoading(true)
         setAlertInfo("")
-        e.preventDefault();
+
+
+
 
         try {
             // const result = await Moralis.Cloud.run("HelloWorld")
@@ -235,6 +243,7 @@ export default function NewProject() {
                     <Form.Item
                         label="Kajabi Webhook Activation URL:"
                         name="activationUrl"
+                        type="url"
                         tooltip={"https://help.kajabi.com/hc/en-us/articles/360037245374-How-to-Use-Webhooks-on-Kajabi"}
                         rules={[
                             {
