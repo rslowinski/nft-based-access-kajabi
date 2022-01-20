@@ -157,7 +157,7 @@ export default function NewProject() {
 
     async function onCreateClick(e) {
         e.preventDefault();
-        if (!(projectNameRef.current.input.value && activationUrlRef.current.input.value && deactivationUrlRef.current.input.value)) {
+        if (!(projectNameRef?.current?.input?.value && activationUrlRef?.current?.input?.value && deactivationUrlRef?.current?.input?.value)) {
             setAlertInfo("Not all fields are filled")
             return
         }
