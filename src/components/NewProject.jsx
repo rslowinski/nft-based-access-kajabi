@@ -64,35 +64,42 @@ export default function NewProject() {
     const existingProject = location.state?.project;
     const [form] = Form.useForm();
 
-    useEffect(async () => {
-        try {
-            const result = await Moralis.Web3API.token.getNFTMetadata({address: selectedNftAddr})
-            setNftMeta({name: result.name, symbol: result.symbol, address: selectedNftAddr})
-        } catch (e) {
-            console.log()
-        } finally {
+    useEffect(() => {
+        async function handleNft() {
+            try {
+                const result = await Moralis.Web3API.token.getNFTMetadata({address: selectedNftAddr})
+                setNftMeta({name: result.name, symbol: result.symbol, address: selectedNftAddr})
+            } catch (e) {
+                console.log()
+            } finally {
 
+            }
         }
+        handleNft()
     }, [selectedNftAddr]);
 
-    useEffect(async () => {
-        if (existingProject) {
-            const Project = new Moralis.Object.extend("Project");
-            let project = new Project();
-            project.set("id", location.state.id)
+    useEffect(() => {
+        async function fetchAndSetData() {
+            if (existingProject) {
+                const Project = new Moralis.Object.extend("Project");
+                let project = new Project();
+                project.set("id", location.state.id)
 
-            if (!project.isDataAvailable()) {
-                project = await project.fetch();
+                if (!project.isDataAvailable()) {
+                    project = await project.fetch();
+                }
+                setNftMeta(setNftMeta({
+                    name: project.get("requiredNftName"),
+                    symbol: project.get("requiredNftSymbol"),
+                    address: project.get("requiredNftAddress")
+                }))
+
+                form.setFieldsValue({requiredNftAddress: project.get("requiredNftAddress")})
+                setSelectedNftAddr(project.get("requiredNftAddress"))
             }
-            setNftMeta(setNftMeta({
-                name: project.get("requiredNftName"),
-                symbol: project.get("requiredNftSymbol"),
-                address: project.get("requiredNftAddress")
-            }))
-
-            form.setFieldsValue({requiredNftAddress: project.get("requiredNftAddress")})
-            setSelectedNftAddr(project.get("requiredNftAddress"))
         }
+
+        fetchAndSetData()
     }, [])
 
     async function onDeleteClick(e) {

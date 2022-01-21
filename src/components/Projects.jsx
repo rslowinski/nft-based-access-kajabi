@@ -47,18 +47,21 @@ export default function Projects() {
     }
 
     useEffect(async () => {
-        setIsLoading(true)
-        try {
-            const Project = Moralis.Object.extend("Project");
-            const query = new Moralis.Query(Project);
-            query.equalTo("owner", user);
-            const projects = await query.find();
-            setProjects(projects)
-        } catch (e) {
-            console.error("Sth went wrong. " + e)
-        } finally {
-            setIsLoading(false)
-        }
+        async function f() {
+            setIsLoading(true)
+            try {
+                const Project = Moralis.Object.extend("Project");
+                const query = new Moralis.Query(Project);
+                query.equalTo("owner", user);
+                const projects = await query.find();
+                setProjects(projects)
+            } catch (e) {
+                console.error("Sth went wrong. " + e)
+            } finally {
+                setIsLoading(false)
+            }
+        };
+        f();
     }, [user])
 
     function editProject(project) {

@@ -47,15 +47,19 @@ export default function PublicProjectDetails(props) {
     const emailRef = useRef();
 
     useEffect(async () => {
-        try {
-            setIsLoading(true)
-            await fetchProject(projectId)
-        } catch (e) {
-            console.log(e)
-            setNothingFound(true)
-        } finally {
-            setIsLoading(false)
+        async function f() {
+            try {
+                setIsLoading(true)
+                await fetchProject(projectId)
+            } catch (e) {
+                console.log(e)
+                setNothingFound(true)
+            } finally {
+                setIsLoading(false)
+            }
         }
+
+        f()
 
     }, [projectId])
 
@@ -97,7 +101,8 @@ export default function PublicProjectDetails(props) {
             const requiredNfts = await Moralis.Web3API.account.getNFTsForContract({token_address: project.requiredNftAddress})
             console.log("has required nfts:" + requiredNfts.result.join(","))
             setIsEligible(requiredNfts.result.length > 0)
-        } catch (e) {}finally {
+        } catch (e) {
+        } finally {
             setIsLoading(false)
         }
     });
