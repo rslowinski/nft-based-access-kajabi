@@ -22,7 +22,7 @@ const styles = {
         borderRadius: "0.5rem",
         width: "22rem",
         height: "24rem",
-        minHeight: "10rem",
+        minHeight: "14rem",
     },
     cardContent: {
         display: "flex",
