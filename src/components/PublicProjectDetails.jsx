@@ -112,7 +112,7 @@ export default function PublicProjectDetails(props) {
             {info && <Alert message={info}/>}
             {project && <Card style={styles.card}>
 
-                <Descriptions title={"Project info"}>
+                <Descriptions bordered layout="vertical" title={"Project info"} style={{marginBottom: "1rem"}}>
                     <Descriptions.Item label={"project name"}>{project.name || "?"}</Descriptions.Item>
                     <Descriptions.Item
                         label={"required nft"}>{project.requiredNftName || (project.requiredNftAddress || "?")}</Descriptions.Item>

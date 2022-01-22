@@ -26,7 +26,7 @@ const styles = {
         border: "1px solid #e7eaf3",
         borderRadius: "0.5rem",
         height: "100%",
-        width: "22rem",
+        width: "19rem",
         // marginTop: "6rem",
         // marginLeft: "0.5rem"
     },
@@ -290,7 +290,7 @@ export default function NewProject() {
                                 <Input disabled ref={requiredNftRef}/>
                             </Form.Item>
                             <Button style={{width: '8rem'}} onClick={() => setShowModal(true)}>NFT Search </Button>
-                            {nftMeta && <Descriptions title={"NFT Collection Info:"}>
+                            {nftMeta && <Descriptions title={"NFT Collection Info:"} bordered layout="vertical">
                                 <Descriptions.Item label={"name"}>{nftMeta.name || "?"}</Descriptions.Item>
                                 <Descriptions.Item label={"symbol"}>{nftMeta.symbol || "?"}</Descriptions.Item>
                             </Descriptions>}
@@ -312,7 +312,7 @@ export default function NewProject() {
                     </Popconfirm>}
                 </Form>
             </Card>
-            <Modal width={"35rem"} visible={showModal} onOk={() => setShowModal(false)}
+            <Modal width={"22rem"} visible={showModal} onOk={() => setShowModal(false)}
                    onCancel={() => setShowModal(false)}>
                 <div>
                     <Card title="NFT Requirements" style={styles.nftCard}>
@@ -345,7 +345,7 @@ export default function NewProject() {
                         <br/>
                         {foundNfts &&
                         <div>
-                            <Table
+                            <Table style={{width: "18rem"}}
                                 columns={[
                                     {title: 'Address', dataIndex: 'address', 'key': 'address'},
                                     {
