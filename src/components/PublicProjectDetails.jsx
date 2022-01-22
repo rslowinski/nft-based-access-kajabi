@@ -20,7 +20,7 @@ const styles = {
         boxShadow: "0 0.5rem 1.2rem rgb(189 197 209 / 20%)",
         border: "1px solid #e7eaf3",
         borderRadius: "0.5rem",
-        width: "32rem",
+        width: "22rem",
         height: "24rem",
         minHeight: "10rem",
     },
