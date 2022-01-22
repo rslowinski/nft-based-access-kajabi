@@ -19,14 +19,14 @@ const styles = {
         borderRadius: "0.5rem",
         height: "100%",
         minHeight: "32rem",
-        width: "22rem"
+        minWidth: "22rem"
     },
     nftCard: {
         boxShadow: "0 0.5rem 1.2rem rgb(189 197 209 / 20%)",
         border: "1px solid #e7eaf3",
         borderRadius: "0.5rem",
         height: "100%",
-        width: "19rem",
+        minWidth: "19rem",
         // marginTop: "6rem",
         // marginLeft: "0.5rem"
     },
@@ -75,6 +75,7 @@ export default function NewProject() {
 
             }
         }
+
         handleNft()
     }, [selectedNftAddr]);
 
@@ -312,7 +313,7 @@ export default function NewProject() {
                     </Popconfirm>}
                 </Form>
             </Card>
-            <Modal width={"22rem"} visible={showModal} onOk={() => setShowModal(false)}
+            <Modal visible={showModal} onOk={() => setShowModal(false)}
                    onCancel={() => setShowModal(false)}>
                 <div>
                     <Card title="NFT Requirements" style={styles.nftCard}>
@@ -345,23 +346,23 @@ export default function NewProject() {
                         <br/>
                         {foundNfts &&
                         <div>
-                            <Table style={{width: "18rem"}}
-                                columns={[
-                                    {title: 'Address', dataIndex: 'address', 'key': 'address'},
-                                    {
-                                        title: 'Action', key: 'action', render: (text, record) => (
-                                            <Space size="middle"
-                                                   onClick={() => {
-                                                       form.setFieldsValue({requiredNftAddress: record.address})
-                                                       setSelectedNftAddr(record.address)
-                                                       setShowModal(false)
-                                                   }}><a>select</a></Space>
-                                        )
-                                    },
-                                ]}
-                                dataSource={foundNfts.map(nft => {
-                                    return {address: nft, dataIndex: nft, 'key': nft}
-                                })}/>
+                            <Table scroll={{x: 'max-content'}} style={{width: "auto"}}
+                                   columns={[
+                                       {
+                                           title: 'Action', key: 'action', render: (text, record) => (
+                                               <Space size="middle"
+                                                      onClick={() => {
+                                                          form.setFieldsValue({requiredNftAddress: record.address})
+                                                          setSelectedNftAddr(record.address)
+                                                          setShowModal(false)
+                                                      }}><a>select</a></Space>
+                                           )
+                                       },
+                                       {title: 'Address', dataIndex: 'address', 'key': 'address'},
+                                   ]}
+                                   dataSource={foundNfts.map(nft => {
+                                       return {address: nft, dataIndex: nft, 'key': nft}
+                                   })}/>
                         </div>
                         }
                     </Card>
