@@ -80,7 +80,7 @@ export default function Projects() {
                 {isLoading && <Card style={styles.card} loading={isLoading}/>}
                 {isLoading && <Card style={styles.card} loading={isLoading}/>}
                 {projects.map(p => {
-                    return <Card title={p.get("name")} hoverable style={styles.card} onClick={() => editProject(p)}>
+                    return <Card key={p.id} title={p.get("name")} hoverable style={styles.card} onClick={() => editProject(p)}>
                         <div style={styles.cardContent}>
                             <span>is publicly available: <Checkbox disabled checked={p.get("isPublic")}/></span>
                             <span>Required NFT: {p.get("requiredNftName") || (p.get("requiredNftAddress") || "?")}</span>
