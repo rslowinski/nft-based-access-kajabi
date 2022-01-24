@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {useHistory, useLocation} from "react-router";
 import Moralis from "moralis";
-import AddressInput from "./AddressInput";
+import AddressInput from "./boilerplate-components/AddressInput";
 
 const styles = {
     title: {

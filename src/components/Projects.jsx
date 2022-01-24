@@ -1,12 +1,11 @@
-import {Alert, Button, Card, Checkbox, Image, Typography} from "antd";
+import {Alert, Button, Card, Checkbox} from "antd";
 import React, {useEffect, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {ReactComponent as PlusIcon} from "../plus.svg";
 import {useHistory} from "react-router";
 import {Link} from "react-router-dom";
-import Account from "./Account/Account";
+import Account from "./boilerplate-components/Account/Account";
 
-const {Text} = Typography;
 
 const styles = {
     title: {
@@ -80,7 +79,8 @@ export default function Projects() {
                 {isLoading && <Card style={styles.card} loading={isLoading}/>}
                 {isLoading && <Card style={styles.card} loading={isLoading}/>}
                 {projects.map(p => {
-                    return <Card key={p.id} title={p.get("name")} hoverable style={styles.card} onClick={() => editProject(p)}>
+                    return <Card key={p.id} title={p.get("name")} hoverable style={styles.card}
+                                 onClick={() => editProject(p)}>
                         <div style={styles.cardContent}>
                             <span>is publicly available: <Checkbox disabled checked={p.get("isPublic")}/></span>
                             <span>Required NFT: {p.get("requiredNftName") || (p.get("requiredNftAddress") || "?")}</span>

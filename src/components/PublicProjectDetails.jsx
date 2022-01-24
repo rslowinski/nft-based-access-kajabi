@@ -1,12 +1,9 @@
-import {Alert, Button, Card, Checkbox, Descriptions, Form, Image, Input, Typography} from "antd";
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import {Alert, Button, Card, Descriptions, Form, Input} from "antd";
+import React, {useEffect, useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
-import {ReactComponent as PlusIcon} from "../plus.svg";
-import {useHistory, useLocation} from "react-router";
-import Account from "./Account/Account";
+import Account from "./boilerplate-components/Account/Account";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
 
-const {Text} = Typography;
 
 const styles = {
     title: {

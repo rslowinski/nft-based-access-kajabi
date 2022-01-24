@@ -1,18 +1,18 @@
 import {useEffect} from "react";
 import {useMoralis} from "react-moralis";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
-import Account from "components/Account/Account";
+import Account from "components/boilerplate-components/Account/Account";
 import {Layout} from "antd";
 import "antd/dist/antd.css";
 import "./style.css";
 import Text from "antd/lib/typography/Text";
-import MenuItems from "./components/MenuItems";
+import MenuItems from "./components/boilerplate-components/MenuItems";
 import {ReactComponent as AppLogo} from './logo.svg';
 import Projects from "./components/Projects";
 import NewProject from "./components/NewProject";
 import PublicProjectDetails from "./components/PublicProjectDetails";
-import Start from "./components/Start";
-import CreateCollection from "./components/CreateCollection";
+import Start from "./components/boilerplate-components/Start";
+import CreateCollection from "./components/boilerplate-components/CreateCollection";
 
 const {Header, Footer} = Layout;
 

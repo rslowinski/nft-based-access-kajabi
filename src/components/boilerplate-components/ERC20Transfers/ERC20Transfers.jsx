@@ -1,7 +1,7 @@
 import React from "react";
 import { useMoralis } from "react-moralis";
-import { getEllipsisTxt } from "../../helpers/formatters";
-import { getExplorer } from "../../helpers/networks";
+import { getEllipsisTxt } from "../../../helpers/formatters";
+import { getExplorer } from "../../../helpers/networks";
 import "antd/dist/antd.css";
 import { Skeleton, Table } from "antd";
 import { useERC20Transfers } from "hooks/useERC20Transfers";
