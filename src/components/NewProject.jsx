@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {useHistory, useLocation} from "react-router";
 import Moralis from "moralis";
-import AddressInput from "./boilerplate-components/AddressInput";
+import NftSearchModal from "./NftSearchModal";
 
 const styles = {
     title: {
@@ -127,41 +127,6 @@ export default function NewProject() {
         }
     }
 
-
-    async function nftSearch(e) {
-        setIsSearching(true)
-        setAlertInfo("")
-        e.preventDefault();
-
-        try {
-            if (!nftContractAddress && nftSearchInput?.current?.input?.value) {
-                const result = await Moralis.Web3API.token.searchNFTs(
-                    {
-                        q: nftSearchInput.current.input.value,
-                        chain: "eth",
-                        filter: "name"
-                    }
-                )
-                const collections = new Array(...new Set(result.result.map(nft => nft.token_address)))
-                setFoundNfts(collections)
-            }
-
-            if (nftContractAddress) {
-                const result = await Moralis.Web3API.token.getNFTMetadata(
-                    {
-                        address: nftContractAddress
-                    }
-                )
-                setFoundNfts([result.token_address])
-            }
-
-        } catch (e) {
-            setAlertInfo("Sth went wrong :(")
-            console.error(e)
-        } finally {
-            setIsSearching(false)
-        }
-    }
 
     async function onCreateClick(e) {
         e.preventDefault();
@@ -313,61 +278,12 @@ export default function NewProject() {
                     </Popconfirm>}
                 </Form>
             </Card>
-            <Modal visible={showModal} onOk={() => setShowModal(false)}
-                   onCancel={() => setShowModal(false)}>
-                <div>
-                    <Card title="NFT Requirements" style={styles.nftCard}>
-                        <Form
-                            labelCol={{
-                                span: 28,
-                            }}
-                            wrapperCol={{
-                                span: 28,
-                            }}
-                            layout="vertical">
-
-                            <Form.Item
-                                label="Search collection by name:"
-                                name="nftSearchInput"
-                            >
-                                <Input ref={nftSearchInput} placeholder={"fancy bears"}/>
-                            </Form.Item>
-
-                            <Form.Item
-                                label="Alternatively search collection by it's contract address:"
-                                name="nftContractAddress"
-                            >
-                                <AddressInput onChange={setNftContractAddress}
-                                              placeholder={"0x87084ec881d5A15C918057F326790dB177D218F2"}/>
-                            </Form.Item>
-
-                            <Button loading={isSearching} type="secondary" onClick={nftSearch}>Search</Button>
-                        </Form>
-                        <br/>
-                        {foundNfts &&
-                        <div>
-                            <Table scroll={{x: 'max-content'}} style={{width: "auto"}}
-                                   columns={[
-                                       {
-                                           title: 'Action', key: 'action', render: (text, record) => (
-                                               <Space size="middle"
-                                                      onClick={() => {
-                                                          form.setFieldsValue({requiredNftAddress: record.address})
-                                                          setSelectedNftAddr(record.address)
-                                                          setShowModal(false)
-                                                      }}><a>select</a></Space>
-                                           )
-                                       },
-                                       {title: 'Address', dataIndex: 'address', 'key': 'address'},
-                                   ]}
-                                   dataSource={foundNfts.map(nft => {
-                                       return {address: nft, dataIndex: nft, 'key': nft}
-                                   })}/>
-                        </div>
-                        }
-                    </Card>
-                </div>
-            </Modal>
+            <NftSearchModal isVisible={showModal} onOk={() => setShowModal(false)} onAddressSelected={(addr) => {
+                form.setFieldsValue({requiredNftAddress: addr})
+                setSelectedNftAddr(addr)
+                setShowModal(false)
+            }}
+            />
 
         </div>
     );
