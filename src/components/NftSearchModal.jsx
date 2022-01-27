@@ -7,7 +7,7 @@ import AddressInput from "./boilerplate-components/AddressInput";
 const StyledModal = styled(Modal)`
 `
 const StyledButton = styled(Button)`
-  margin: 1rem 0;
+  margin: 0 0 1rem 0;
 `
 
 export default function NftSearchModal(props) {
@@ -80,7 +80,7 @@ export default function NftSearchModal(props) {
                                       placeholder={"0x87084ec881d5A15C918057F326790dB177D218F2"}/>
                     </Form.Item>
                 </Form>
-                <Button loading={isLoading} type="secondary" onClick={nftSearch}>Search</Button>
+                <StyledButton loading={isLoading} type="secondary" onClick={nftSearch}>Search</StyledButton>
             </div>
             <div>
                 <Table scroll={{x: 'max-content'}} style={{width: "auto"}}
