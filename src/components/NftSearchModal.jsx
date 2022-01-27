@@ -17,8 +17,6 @@ export default function NftSearchModal(props) {
     const [searchAddress, setSearchAddress] = useState("");
 
     const nftSearch = async () => {
-        console.log("HEJA")
-        console.log("HEJA")
         setIsLoading(true)
 
         try {
