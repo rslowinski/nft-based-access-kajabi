@@ -1,4 +1,4 @@
-import {Alert, Button, Card, Checkbox, Descriptions, Form, Input, Modal, Popconfirm, Space, Table} from "antd";
+import {Alert, Button, Card, Checkbox, Descriptions, Form, Input, Popconfirm} from "antd";
 import React, {useEffect, useRef, useState} from "react";
 import {useMoralis} from "react-moralis";
 import {useHistory, useLocation} from "react-router";
@@ -47,17 +47,13 @@ export default function NewProject() {
     const {user} = useMoralis();
     const [alertInfo, setAlertInfo] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const [isSearching, setIsSearching] = useState(false)
     const [showModal, setShowModal] = useState(false)
-    const [foundNfts, setFoundNfts] = useState([])
     const [nftMeta, setNftMeta] = useState('')
     const [selectedNftAddr, setSelectedNftAddr] = useState('')
-    const [nftContractAddress, setNftContractAddress] = useState();
     const projectNameRef = useRef();
     const activationUrlRef = useRef();
     const deactivationUrlRef = useRef();
     const requiredNftRef = useRef();
-    const nftSearchInput = useRef();
     const isPublicRef = useRef();
     const history = useHistory();
     const location = useLocation();
@@ -101,7 +97,7 @@ export default function NewProject() {
         }
 
         fetchAndSetData()
-    }, [])
+    }, [existingProject]) // eslint-disable-line react-hooks/exhaustive-deps
 
     async function onDeleteClick(e) {
         e.preventDefault();
@@ -263,14 +259,14 @@ export default function NewProject() {
                         </Input.Group>
                     </Form.Item>
 
-                    <Button style={styles.updateButton} disabled={isLoading || isSearching} type="primary"
+                    <Button style={styles.updateButton} disabled={isLoading} type="primary"
                             onClick={onCreateClick}>
                         {existingProject && "Update"}
                         {!existingProject && "Create"}
                     </Button>
 
                     {existingProject &&
-                    <Popconfirm disabled={isLoading || isSearching} title="It can't be reverted, are you sure?"
+                    <Popconfirm disabled={isLoading} title="It can't be reverted, are you sure?"
                                 onConfirm={onDeleteClick}>
                         <Button danger style={styles.deleteButton}>
                             Delete project

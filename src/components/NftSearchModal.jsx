@@ -88,7 +88,7 @@ export default function NftSearchModal(props) {
                                    <Space size="middle"
                                           onClick={() => {
                                               props.onAddressSelected(record.address)
-                                          }}><a>select</a></Space>
+                                          }}><a href={() => false}>select</a></Space>
                                )
                            },
                            {title: 'Address', dataIndex: 'address', 'key': 'address'},

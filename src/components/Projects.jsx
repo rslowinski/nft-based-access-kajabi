@@ -44,7 +44,7 @@ export default function Projects() {
         history.push("/new-project")
     }
 
-    useEffect(async () => {
+    useEffect(() => {
         async function f() {
             setIsLoading(true)
             try {
@@ -58,9 +58,10 @@ export default function Projects() {
             } finally {
                 setIsLoading(false)
             }
-        };
+        }
+
         f();
-    }, [user])
+    }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
     function editProject(project) {
         history.push('/new-project', {project: project.attributes, id: project.id})

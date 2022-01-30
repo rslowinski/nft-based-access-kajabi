@@ -11,8 +11,8 @@ import {ReactComponent as AppLogo} from './logo.svg';
 import Projects from "./components/Projects";
 import NewProject from "./components/NewProject";
 import PublicProjectDetails from "./components/PublicProjectDetails";
-import Start from "./components/boilerplate-components/Start";
-import CreateCollection from "./components/boilerplate-components/CreateCollection";
+import Start from "./components/Start";
+import CreateCollection from "./components/CreateCollection";
 
 const {Header, Footer} = Layout;
 

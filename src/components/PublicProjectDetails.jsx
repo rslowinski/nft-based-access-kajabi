@@ -42,11 +42,11 @@ export default function PublicProjectDetails(props) {
     const [info, setInfo] = useState();
     const emailRef = useRef();
 
-    useEffect(async () => {
+    useEffect(() => {
         async function f() {
             try {
                 setIsLoading(true)
-                await fetchProject(projectId)
+                await fetchProject()
             } catch (e) {
                 console.log(e)
                 setNothingFound(true)
@@ -57,7 +57,7 @@ export default function PublicProjectDetails(props) {
 
         f()
 
-    }, [projectId])
+    }, [projectId]) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (props?.match?.params?.projectId) {
