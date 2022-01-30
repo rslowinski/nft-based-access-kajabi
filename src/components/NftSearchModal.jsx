@@ -88,9 +88,6 @@ export default function NftSearchModal(props) {
                                    <Space size="middle"
                                           onClick={() => {
                                               props.onAddressSelected(record.address)
-                                              // form.setFieldsValue({requiredNftAddress: record.address})
-                                              // setSelectedNftAddr(record.address)
-                                              // setShowModal(false)
                                           }}><a>select</a></Space>
                                )
                            },
